@@ -1,0 +1,6 @@
+[package]
+name = "algorithms_in_a_nutshell"
+version = "0.1.0"
+authors = ["Kaiyin Zhong <kindlychung@gmail.com>"]
+
+[dependencies]
