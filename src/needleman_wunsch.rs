@@ -1,16 +1,15 @@
-
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum Direction {
-    Match, // go diagonally, left and up
-    Left,
-    Up,
-    Undefined, 
+	Match, // go diagonally, left and up
+	Left,
+	Up,
+	Undefined, 
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub struct ResultEntry {
-    pub score: i64,
-    pub direction: Direction,
+	pub score: i64,
+	pub direction: Direction,
 }
 
 impl ResultEntry {
@@ -23,7 +22,7 @@ impl ResultEntry {
 }
 
 pub trait NeedlemanWunsch<T> {
-    fn align(&mut self, vec: &mut Vec<T>, similarity: &Fn(&T, &T) -> i64, gap_penalty: i64) -> (Vec<Option<T>>, Vec<Option<T>>);
+	fn align(&mut self, vec: &mut Vec<T>, similarity: &Fn(&T, &T) -> i64, gap_penalty: i64) -> (Vec<Option<T>>, Vec<Option<T>>);
 }
 
 
@@ -38,12 +37,8 @@ impl<T> NeedlemanWunsch<T> for Vec<T> where T: Eq + Copy + Clone {
 		let mut i = self.len(); 
 		let mut j = vec.len(); 
 		loop {
-			print_mat(mat);
-//			println!("Node: {:?}, Node direction: {:?}", (i, j), mat[i][j].direction);
 			match mat[i][j].direction {
 				Direction::Match => {
-					// the dimension of the alignment matrix is one larger than vec1.len by vec2.len
-//					println!("Tracing {:?}", (i, j));
 					vec1.insert(0, Some(self[i-1]));
 					vec2.insert(0, Some(vec[j-1]));
 					i -= 1; 
@@ -72,20 +67,20 @@ impl<T> NeedlemanWunsch<T> for Vec<T> where T: Eq + Copy + Clone {
 
 #[test]
 fn test_align() {
-    fn similarity(c1: &char, c2: &char) -> i64 {
-        if c1 == c2 { 1 } else { -1 }
-    }
-    let mut vec1: Vec<char> = "what".chars().collect();
-    let mut vec2: Vec<char> = "white".chars().collect();
-    let res = vec1.align(&mut vec2, &similarity, -1);
+	fn similarity(c1: &char, c2: &char) -> i64 {
+		if c1 == c2 { 1 } else { -1 }
+	}
+	let mut vec1: Vec<_> = "what".chars().collect();
+	let mut vec2: Vec<_> = "white".chars().collect();
+	let res = vec1.align(&mut vec2, &similarity, -1);
 	let res_should_be = (
 		vec![Some('w'), Some('h'), Some('a'), Some('t'), None], 
 		vec![Some('w'), Some('h'), Some('i'), Some('t'), Some('e')], 
 	);
 	assert_eq!(res, res_should_be);
-    let mut vec1: Vec<char> = "ab".chars().collect();
-    let mut vec2: Vec<char> = "aeb".chars().collect();
-    let res = vec1.align(&mut vec2, &similarity, -1);
+	let mut vec1: Vec<_> = "ab".chars().collect();
+	let mut vec2: Vec<_> = "aeb".chars().collect();
+	let res = vec1.align(&mut vec2, &similarity, -1);
 	let res_should_be = (
 		vec![Some('a'), None, Some('b')], 
 		vec![Some('a'), Some('e'), Some('b')], 
@@ -134,8 +129,8 @@ fn test_fill_mat() {
 				-1
 			}
 		}
-		let mut vec1: Vec<char>  = "ab".chars().collect();
-		let mut vec2: Vec<char>  = "aeb".chars().collect();
+		let mut vec1: Vec<_>  = "ab".chars().collect();
+		let mut vec2: Vec<_>  = "aeb".chars().collect();
 		let mut mat = init_align_matrix(vec1.len(), vec2.len());
 		fill_align_matrix(&mut mat, &mut vec1, &mut vec2, &similarity, -1);
 		use self::Direction::Undefined as ud;
@@ -169,19 +164,31 @@ fn fill_align_matrix<T>(mat: &mut AlignMatrix, vec1: &mut Vec<T>, vec2: &mut Vec
 			let up_score = up + gap_penalty; 
 			let left_score = left + gap_penalty;
 			let m = *[match_score, up_score, left_score].iter().max().unwrap();
-//			print_mat(mat);
-//			println!("Node: {:?}", (i, j));
-//			println!("up_left, up, left: {:?}", (up_left, up, left));
-//			println!("Match, up, left: {:?}", (match_score, up_score, left_score));
-//			println!("Max score: {}", m);
+			#[cfg(feature = "verbose")]
+			{
+				print_mat(mat);
+				println!("Node: {:?}", (i, j));
+				println!("up_left, up, left: {:?}", (up_left, up, left));
+				println!("Match, up, left: {:?}", (match_score, up_score, left_score));
+				println!("Max score: {}", m);
+			}
 			if m == match_score {
-//				println!("Go Up and Left!");	
+				#[cfg(feature = "verbose")]
+				{
+					println!("Go Up and Left!");	
+				}
 				mat[i][j] = ResultEntry::new(m, Direction::Match);
 			} else if m == up_score {
+				#[cfg(feature = "verbose")]
+				{
+					println!("Go Up!");	
+				}
 				mat[i][j] = ResultEntry::new(m, Direction::Up);
-//				println!("Go Up!");	
 			} else {
-//				println!("Go Left!");	
+				#[cfg(feature = "verbose")]
+				{
+					println!("Go Left!");	
+				}
 				mat[i][j] = ResultEntry::new(m, Direction::Left);
 			}
 			m
@@ -191,6 +198,10 @@ fn fill_align_matrix<T>(mat: &mut AlignMatrix, vec1: &mut Vec<T>, vec2: &mut Vec
 		for j in 1..(vec2.len() + 1) {
 			get_score_set_direction(mat, vec1, vec2, similarity, gap_penalty, i, j);
 		}
+	}
+	#[cfg(feature = "verbose")] 
+	{
+		print_mat(mat);
 	}
 }
 
