@@ -1,3 +1,5 @@
+/// A Z^m number system includes integers in the interval [0, m) when m > 0 or (m, 0] when m < 0. 
+/// The code defines a trait Mod to represent numbers in this system and the +, -, and * operator for it.
 use std::ops::{Add, Mul, Sub, Rem};
 
 trait Modulo<Rhs = Self> {

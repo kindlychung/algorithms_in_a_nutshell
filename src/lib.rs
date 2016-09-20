@@ -9,6 +9,7 @@ pub mod triangle;
 pub mod max_elem;
 pub mod needleman_wunsch;
 pub mod zm;
+pub mod insertion_sort;
 
 #[macro_use]
 extern crate itertools;
