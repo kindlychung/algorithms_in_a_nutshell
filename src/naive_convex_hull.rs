@@ -58,23 +58,9 @@ mod test {
     use std::collections::BTreeSet;
 
     use super::*;
+	use point::Point;
+	use triangle::Triangle;
 
-    #[test]
-    fn test_point() {
-        use std::f64::consts::PI;
-        let p1 = Point::new(0.0, 0.0);
-        let p2 = Point::new(0.0, 1.0);
-        assert_eq!(p1.angle(&p2), PI / 2.0);
-        assert_eq!(p1.distance(&p2), 1.0);
-        let p1 = Point::new(0.0, 0.0);
-        let p2 = Point::new(1.0, 1.0);
-        assert_eq!(p1.angle(&p2), PI / 4.0);
-        assert_eq!(p1.distance(&p2), 2.0f64.sqrt());
-        let p1 = Point::new(0.0, 0.0);
-        let p2 = Point::new(1.0, -1.0);
-        assert_eq!(p1.angle(&p2), -PI / 4.0);
-        assert_eq!(p1.distance(&p2), 2.0f64.sqrt());
-    }
 
     #[test]
     fn test_convex_hull_naive() {
@@ -105,43 +91,4 @@ mod test {
         assert_eq!(hull, hull_should_be);
     }
 
-    #[test]
-    fn test_triangle() {
-        let p2 = Point::new(0.0, 0.0);
-        let p1 = Point::new(0.0, 1.0);
-        let p0 = Point::new(1.0, 1.0);
-        let t = Triangle::new(p0, p1, p2);
-        assert_eq!(t.range_x(), (0.0, 1.0));
-        assert_eq!(t.range_y(), (0.0, 1.0));
-        assert_eq!(t.p0, p2);
-        assert_eq!(t.p1, p1);
-        assert_eq!(t.p2, p0);
-        // triangle should not contain its vertices
-        assert!(!t.contains(p0));
-        assert!(!t.contains(p1));
-        assert!(!t.contains(p2));
-        // triangle should not contain points on any side
-        assert!(!t.contains(Point::new(0.5, 0.5)));
-        assert!(!t.contains(Point::new(0.3, 0.3)));
-        assert!(!t.contains(Point::new(0.2, 0.2)));
-        assert!(!t.contains(Point::new(0.1, 0.1)));
-        assert!(!t.contains(Point::new(0.0, 0.1)));
-        assert!(!t.contains(Point::new(0.0, 0.2)));
-        assert!(!t.contains(Point::new(0.1, 1.0)));
-        assert!(!t.contains(Point::new(0.2, 1.0)));
-        assert!(!t.contains(Point::new(0.2, 1.1)));
-        // strictly inside the triangle
-        assert!(t.contains(Point::new(0.5, 0.51)));
-        assert!(t.contains(Point::new(0.5, 0.52)));
-        assert!(t.contains(Point::new(0.5, 0.53)));
-        let p2 = Point::new(0.0, 0.0);
-        let p1 = Point::new(0.5, 1.0);
-        let p0 = Point::new(1.0, 0.5);
-        let t = Triangle::new(p0, p1, p2);
-        assert_eq!(t.range_x(), (0.0, 1.0));
-        assert_eq!(t.range_y(), (0.0, 1.0));
-        assert_eq!(t.p0, p2);
-        assert_eq!(t.p1, p1);
-        assert_eq!(t.p2, p0);
-    }
 }
